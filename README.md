@@ -1,6 +1,6 @@
 # Myth Or Fact LGBT API
 
-This project is a Spring Boot backend API for the "Myth Or Fact LGBT" game. It allows user registration, login, management of game statements (myths/facts), and tracking of game history. The API is secured using JWT. It can be run locally with MySQL or deployed as a serverless application to AWS Lambda using the Serverless Stack Toolkit (SST).
+This project is a Spring Boot backend API for the "Myth Or Fact LGBT" game. It allows user registration, login, management of game statements (myths/facts), and tracking of game history. The API is secured using JWT. It can be run locally with MySQL or deployed to various cloud platforms that support Java applications, such as Render.
 
 ## Features
 - User registration and JWT-based authentication.
@@ -8,15 +8,14 @@ This project is a Spring Boot backend API for the "Myth Or Fact LGBT" game. It a
 - Recording and retrieval of game history and scores.
 - API documentation via Swagger UI.
 - Local development profile (MySQL) and production profile (PostgreSQL on Supabase).
-- Serverless deployment configured with SST.
+- Standard Spring Boot packaging for easy deployment.
 
 ## Prerequisites
 - **Java 17** (or newer)
 - **Apache Maven** (3.6.x or newer)
 - **MySQL Server** (for local development, e.g., version 8.x)
-- **Node.js and npm** (for SST, latest LTS recommended)
-- **AWS CLI** (configured with credentials, for SST deployment)
-- **SST CLI** (`npm install -g sst`)
+- **Spring Tools Suite (STS)** (Recommended IDE for local development, see tutorial)
+- **Git** (for version control)
 
 ## Local Development Setup
 
@@ -31,7 +30,6 @@ This project is a Spring Boot backend API for the "Myth Or Fact LGBT" game. It a
     ```sql
     CREATE DATABASE mythOrFactLGBT_dev CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     ```
-    *(Using utf8mb4 is good practice for broader character support).*
 
 3.  **Configure Local Database Connection:**
     Open `src/main/resources/application-dev.properties`.
@@ -42,13 +40,16 @@ This project is a Spring Boot backend API for the "Myth Or Fact LGBT" game. It a
     ```
     The `spring.datasource.url` should already be set to use `mythOrFactLGBT_dev` on `localhost:3306`.
 
-4.  **Build the project (optional, Spring Boot Maven plugin can run without pre-packaging for dev):**
+4.  **Import into Spring Tools Suite (STS):**
+    See the [TUTORIAL.md](TUTORIAL.md) for detailed instructions on importing and running the project in STS.
+
+5.  **Build the project (optional, STS and Spring Boot Maven plugin can run without pre-packaging for dev):**
     ```bash
     mvn clean install
     ```
 
-## Running Locally
-To run the application locally using the `dev` profile (connected to your local MySQL):
+## Running Locally (using Maven)
+If not running from STS, to run the application locally using the `dev` profile (connected to your local MySQL) via Maven:
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
@@ -59,6 +60,7 @@ To execute the unit and integration tests:
 ```bash
 mvn test
 ```
+You can also run tests from STS.
 
 ## API Documentation (Swagger UI)
 Once the application is running locally, you can access the Swagger UI for API documentation and testing at:
@@ -73,8 +75,9 @@ Once the application is running locally, you can access the Swagger UI for API d
 - **Game History:** `/api/gamehistory`
 Refer to Swagger UI for detailed request/response formats and to try out the endpoints.
 
-## Serverless Deployment (SST)
-For deploying to AWS Lambda using SST, please refer to the [TUTORIAL.md](TUTORIAL.md) for detailed instructions.
+## Deployment (e.g., to Render)
+This application is a standard Spring Boot application and can be deployed to various cloud platforms like Render.
+For general guidance on preparing for deployment and specific instructions for STS, see the [TUTORIAL.md](TUTORIAL.md).
 
 ---
-*This README provides a basic guide. For more detailed instructions, especially on API usage and SST deployment, see [TUTORIAL.md](TUTORIAL.md).*
+*This README provides a basic guide. For more detailed instructions, especially on API usage, STS setup, and deployment, see [TUTORIAL.md](TUTORIAL.md).*

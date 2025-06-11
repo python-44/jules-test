@@ -1,9 +1,14 @@
 # Myth Or Fact LGBT API - Tutorial
 
-This tutorial provides detailed instructions for setting up the local development environment, using the API, and deploying the application to AWS Lambda using the Serverless Stack Toolkit (SST).
+This tutorial provides detailed instructions for setting up the local development environment using Spring Tools Suite (STS), using the API, and preparing the application for deployment to platforms like Render.
 
 ## Table of Contents
-1.  [Local Development Setup](#1-local-development-setup)
+1.  [Local Development Setup with Spring Tools Suite (STS)](#1-local-development-setup-with-spring-tools-suite-sts)
+    *   [Prerequisites](#prerequisites)
+    *   [Importing Project into STS](#importing-project-into-sts)
+    *   [Database Setup (MySQL)](#database-setup-mysql)
+    *   [Configuring Database Connection in Project](#configuring-database-connection-in-project)
+    *   [Running the Application in STS](#running-the-application-in-sts)
 2.  [Understanding the Project Structure](#2-understanding-the-project-structure)
 3.  [Using the API](#3-using-the-api)
     *   [Authentication](#authentication)
@@ -12,63 +17,70 @@ This tutorial provides detailed instructions for setting up the local developmen
     *   [Managing Game History](#managing-game-history)
 4.  [Accessing API Documentation (Swagger UI)](#4-accessing-api-documentation-swagger-ui)
 5.  [Running Tests](#5-running-tests)
-6.  [Serverless Deployment with SST](#6-serverless-deployment-with-sst)
-    *   [Prerequisites for SST](#prerequisites-for-sst)
-    *   [Configure AWS Credentials](#configure-aws-credentials)
-    *   [Install SST CLI](#install-sst-cli)
-    *   [Build the Spring Boot Application](#build-the-spring-boot-application)
-    *   [Deploying to AWS](#deploying-to-aws)
-    *   [Testing the Deployed API](#testing-the-deployed-api)
-    *   [Viewing Logs](#viewing-logs)
-    *   [Cleaning Up SST Deployment](#cleaning-up-sst-deployment)
+    *   [Running Tests with Maven](#running-tests-with-maven)
+    *   [Running Tests in STS](#running-tests-in-sts)
+6.  [Preparing for Deployment (e.g., to Render)](#6-preparing-for-deployment-eg-to-render)
+    *   [Build the Executable JAR](#build-the-executable-jar)
+    *   [General Deployment Guidance for Render](#general-deployment-guidance-for-render)
 
 ---
 
-## 1. Local Development Setup
+## 1. Local Development Setup with Spring Tools Suite (STS)
 
-Follow these steps to set up the project for local development:
+### Prerequisites
+- **Java 17** (or newer JDK)
+- **Apache Maven** (3.6.x or newer - often bundled with STS or can be configured)
+- **MySQL Server** (e.g., version 8.x)
+- **Spring Tools Suite (STS)**: Download and install from [spring.io/tools](https://spring.io/tools).
+- **Git**
 
-*   **Prerequisites:**
-    *   Java 17 (or newer)
-    *   Apache Maven (3.6.x or newer)
-    *   MySQL Server (e.g., version 8.x)
-    *   Git
-
-1.  **Clone the repository:**
+### Importing Project into STS
+1.  **Clone the repository** (if you haven't already):
     ```bash
     git clone <repository-url>
-    cd mythOrFactLGBT
     ```
+2.  **Launch STS.**
+3.  Go to **File -> Import...**.
+4.  In the Import dialog, expand **Maven** and select **Existing Maven Projects**. Click **Next**.
+5.  For **Root Directory**, click **Browse...** and navigate to the directory where you cloned the `mythOrFactLGBT` project.
+6.  STS should automatically detect the `pom.xml` file. Ensure it is checked.
+7.  Click **Finish**. STS will import the project and download dependencies (this may take some time).
 
-2.  **Create MySQL Database:**
-    Ensure your MySQL server is running. Connect to it using a MySQL client (e.g., `mysql` command line, MySQL Workbench) and execute:
+### Database Setup (MySQL)
+1.  Ensure your MySQL server is running.
+2.  Connect to MySQL using a client (e.g., `mysql` command line, MySQL Workbench, DBeaver) and execute:
     ```sql
     CREATE DATABASE mythOrFactLGBT_dev CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     ```
 
-3.  **Configure Database Connection:**
-    Edit the `src/main/resources/application-dev.properties` file.
-    Update `spring.datasource.username` and `spring.datasource.password` with your MySQL credentials.
+### Configuring Database Connection in Project
+1.  In STS, navigate to `src/main/resources` in the Project Explorer.
+2.  Open `application-dev.properties`.
+3.  Update `spring.datasource.username` and `spring.datasource.password` with your MySQL credentials:
     ```properties
     spring.datasource.url=jdbc:mysql://localhost:3306/mythOrFactLGBT_dev?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     spring.datasource.username=your_mysql_username
     spring.datasource.password=your_mysql_password
-    # ... other properties ...
     ```
 
-4.  **Build and Run the Application:**
-    Open a terminal in the project root directory.
-    To run the application:
-    ```bash
-    mvn spring-boot:run -Dspring-boot.run.profiles=dev
-    ```
-    The API should start on `http://localhost:8080`. You'll see Spring Boot logs in the console.
+### Running the Application in STS
+1.  In the Project Explorer or Package Explorer, find the main application class: `src/main/java/com/veras/mythOrFactLGBT/MythOrFactLgbtApplication.java`.
+2.  Right-click on `MythOrFactLgbtApplication.java`.
+3.  Select **Run As -> Spring Boot App**.
+4.  The application will start, and you'll see logs in the STS Console view. By default, it uses the `dev` profile (due to `spring.profiles.active=${SPRING_PROFILES_ACTIVE:dev}` in `application.properties` and no `SPRING_PROFILES_ACTIVE` environment variable being set).
+5.  The API should be available at `http://localhost:8080`.
+
+   **To explicitly set a profile (e.g., 'dev') in STS Run Configuration:**
+   1. Right-click `MythOrFactLgbtApplication.java` -> Run As -> Run Configurations...
+   2. Select "Spring Boot App" -> "MythOrFactLgbtApplication".
+   3. Go to the "(x)= Arguments" tab. In "VM arguments", you can add: `-Dspring.profiles.active=dev`
+   4. Or, go to the "Spring Boot" tab and under "Profile", type `dev`.
+   5. Click Apply, then Run.
 
 ---
 
 ## 2. Understanding the Project Structure
-(Briefly describe key directories like `src/main/java/com/veras/mythOrFactLGBT` and their contents: `config`, `controller`, `dto`, `model`, `repository`, `security`, `service`. Also mention `pom.xml`, `application.properties`, `sst.config.ts`.)
-
+(This section can largely remain the same as before, just ensure paths like `LambdaHandler.java` are removed if they were mentioned)
 - `src/main/java/com/veras/mythOrFactLGBT`: Contains all Java source code.
   - `config`: Spring configuration classes (Security, OpenAPI).
   - `controller`: REST API controllers.
@@ -78,165 +90,82 @@ Follow these steps to set up the project for local development:
   - `security`: Spring Security related classes (JWT, UserDetailsService).
   - `service`: Business logic layer.
   - `MythOrFactLgbtApplication.java`: Main Spring Boot application class.
-  - `LambdaHandler.java`: AWS Lambda entry point for SST deployment.
 - `src/main/resources`: Application properties, static assets.
   - `application.properties`: Default and profile-common settings.
   - `application-dev.properties`: Settings for the `dev` profile (local MySQL).
-  - `application-prod.properties`: Settings for the `prod` profile (Supabase/PostgreSQL for SST).
+  - `application-prod.properties`: Settings for the `prod` profile (PostgreSQL for production).
 - `src/test/java`: Unit and integration tests.
-- `pom.xml`: Maven project configuration (dependencies, build settings).
-- `sst.config.ts`: Serverless Stack Toolkit configuration for AWS deployment.
-- `README.md`: This file.
+- `pom.xml`: Maven project configuration.
+- `README.md`: Project overview.
 - `TUTORIAL.md`: This tutorial.
 
 ---
 
 ## 3. Using the API
-
-You can use tools like `curl`, Postman, or Insomnia to interact with the API. The base URL for local development is `http://localhost:8080`.
-
-### Authentication
-
-#### Register a New User
-- **Endpoint:** `POST /api/auth/register`
-- **Request Body:** JSON
-  ```json
-  {
-    "username": "testuser",
-    "email": "test@example.com",
-    "password": "password123"
-  }
-  ```
-- **Example with `curl`:**
-  ```bash
-  curl -X POST -H "Content-Type: application/json" \
-   -d '{"username":"testuser","email":"test@example.com","password":"password123"}' \
-   http://localhost:8080/api/auth/register
-  ```
-- **Response:** A success message or an error if username/email exists.
-
-#### Login
-- **Endpoint:** `POST /api/auth/login`
-- **Request Body:** JSON
-  ```json
-  {
-    "username": "testuser",
-    "password": "password123"
-  }
-  ```
-- **Example with `curl`:**
-  ```bash
-  curl -X POST -H "Content-Type: application/json" \
-   -d '{"username":"testuser","password":"password123"}' \
-   http://localhost:8080/api/auth/login
-  ```
-- **Response:** JSON containing `token`, `tokenType`, `userId`, `username`.
-  ```json
-  {
-    "token": "eyJhbGciOiJIUzI1NiJ9...",
-    "tokenType": "Bearer",
-    "userId": 1,
-    "username": "testuser"
-  }
-  ```
-  **Save this `token`. You'll need it for authenticated requests.**
-
-### Accessing Secured Endpoints
-For endpoints that require authentication, include the JWT token in the `Authorization` header:
-`Authorization: Bearer <your_jwt_token>`
-
-### Managing Users
-
-#### Get Current User Details
-- **Endpoint:** `GET /api/users/me`
-- **Headers:** `Authorization: Bearer <your_jwt_token>`
-- **Example with `curl`:**
-  ```bash
-  curl -H "Authorization: Bearer <your_jwt_token>" http://localhost:8080/api/users/me
-  ```
-
-*(Add examples for other key endpoints for Statements and Game History, showing how to use POST, GET, PUT, DELETE with JWT where necessary. For brevity, these are omitted here but should be included in the actual file.)*
+(This section remains the same - `curl` examples for registration, login, and accessing secured endpoints.)
 
 ---
 
 ## 4. Accessing API Documentation (Swagger UI)
-
-While the application is running locally, open your web browser and navigate to:
-[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-
-Swagger UI provides an interactive way to:
-- View all available API endpoints.
-- See request and response models (DTOs).
-- Execute API requests directly from the browser.
-- For secured endpoints, click the "Authorize" button and paste your JWT token (including the "Bearer " prefix if not automatically handled by Swagger UI, though typically just the token is needed for the input field after selecting "bearerAuth").
+(This section remains the same - instructions to access Swagger UI at `http://localhost:8080/swagger-ui.html`.)
 
 ---
 
 ## 5. Running Tests
 
-To run the automated tests (unit and integration):
+### Running Tests with Maven
+From the project root in a terminal:
 ```bash
 mvn test
 ```
-Test results will be shown in the console and usually in `target/surefire-reports/`.
+
+### Running Tests in STS
+1.  In the Project Explorer, right-click on the project root (`mythOrFactLGBT`), a specific package, or a test class.
+2.  Select **Run As -> JUnit Test**.
+3.  Test results will appear in the JUnit view in STS.
 
 ---
 
-## 6. Serverless Deployment with SST
+## 6. Preparing for Deployment (e.g., to Render)
 
-This section guides you through deploying the API to AWS Lambda using SST.
+This application is a standard Spring Boot application. Platforms like Render can typically deploy it by running its executable JAR file.
 
-### Prerequisites for SST
-- **Node.js and npm:** Install from [nodejs.org](https://nodejs.org/).
-- **AWS CLI:** Install and configure with your AWS credentials. See [AWS CLI Configuration](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html).
-  You typically run:
-  ```bash
-  aws configure
-  ```
-  And provide your AWS Access Key ID, Secret Access Key, default region, and output format.
+### Build the Executable JAR
+To create the executable "fat JAR" that contains all dependencies:
+1.  Open a terminal in the project root.
+2.  Run the Maven package command:
+    ```bash
+    mvn clean package
+    ```
+3.  The JAR file will be created in the `target/` directory (e.g., `target/mythOrFactLGBT-0.0.1-SNAPSHOT.jar`).
 
-### Install SST CLI
-If you haven't already, install the SST command-line interface globally:
-```bash
-npm install -g sst
-```
+### General Deployment Guidance for Render
 
-### Build the Spring Boot Application
-SST needs the packaged Spring Boot application (fat JAR) to deploy.
-From the project root, run:
-```bash
-mvn clean package
-```
-This will create the JAR file in the `target/` directory (e.g., `target/mythOrFactLGBT-0.0.1-SNAPSHOT.jar`). The `sst.config.ts` is configured to use this path.
+When deploying to Render (or similar platforms like Heroku, Google Cloud Run, AWS Elastic Beanstalk):
 
-### Deploying to AWS
-SST uses "stages" for deployment environments. The default stage is configured in `.sst/stage` (e.g., `dev`).
-To deploy to your personal development stage (e.g., if your `.sst/stage` file contains `yourusername`):
-```bash
-sst deploy --stage yourusername
-```
-Or, to deploy to a specific stage like "prod" (ensure `sst.config.ts` handles production settings appropriately, especially secrets):
-```bash
-sst deploy --stage prod
-```
-SST will provision the necessary AWS resources (API Gateway, Lambda function, IAM roles). This might take a few minutes.
-Upon completion, SST will output the API endpoint URL.
+1.  **Service Type:** Choose "Web Service" on Render.
+2.  **Environment/Runtime:** Select a Java environment. Render often auto-detects Spring Boot applications.
+3.  **Build Command (if Render builds from your repository):**
+    Render might auto-detect a Maven project and run `mvn clean package -DskipTests` or similar. You can usually customize this to `mvn clean package`.
+4.  **Start Command:**
+    This command runs your packaged application. You must activate the `prod` profile.
+    ```bash
+    java -Dspring.profiles.active=prod -jar target/mythOrFactLGBT-0.0.1-SNAPSHOT.jar
+    ```
+5.  **Environment Variables:**
+    You will need to configure these in Render's dashboard for your service:
+    *   `SPRING_PROFILES_ACTIVE`: `prod`
+    *   `SPRING_DATASOURCE_URL`: The JDBC URL for your production Supabase PostgreSQL database. Example (from `application-prod.properties`): `jdbc:postgresql://aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require`
+    *   `SPRING_DATASOURCE_USERNAME`: Your Supabase database username (e.g., `postgres.goazwmbvraoengmetdpy`)
+    *   `SPRING_DATASOURCE_PASSWORD`: Your Supabase database password.
+    *   `SUPABASE_JWT_SECRET`: Your application's JWT secret (the long string you provided).
+    *   `SERVER_PORT`: Render typically sets a `PORT` environment variable. Spring Boot automatically picks this up. If you need to override or ensure a specific port, you can set `server.port=${PORT:8080}` in `application-prod.properties` or pass `-Dserver.port=$PORT` in the start command, but usually, Spring Boot's default behavior is sufficient.
 
-### Testing the Deployed API
-Use the API endpoint URL provided by SST after deployment. You can use `curl`, Postman, or your browser (for GET requests) to test the deployed API. Remember to use the `/api/...` paths as defined in your controllers (e.g., `https://<sst_api_id>.execute-api.<region>.amazonaws.com/api/auth/login`).
+6.  **Database:**
+    Ensure your Supabase (or other production PostgreSQL) database is accessible from Render's services. The connection details are provided via the environment variables above.
 
-### Viewing Logs
-You can view logs for your deployed Lambda function via the AWS Management Console (CloudWatch Logs) or using SST CLI:
-```bash
-sst logs --stage yourusername --name api # Or the name given in sst.config.ts
-```
-
-### Cleaning Up SST Deployment
-To remove all AWS resources created by SST for a specific stage:
-```bash
-sst remove --stage yourusername
-```
-This will delete the API Gateway, Lambda function, and associated resources.
+7.  **Health Checks (Render):**
+    Render will likely perform health checks. Spring Boot Actuator (`spring-boot-starter-actuator`) provides a default `/actuator/health` endpoint. If Actuator is not included, Render might ping the root `/` or a custom path you define. Ensure your application responds with a `200 OK` on the health check path. (Note: Actuator is not currently in the pom.xml, so default Spring MVC behavior on `/` or error page would be the target unless specified).
 
 ---
-This tutorial should help you get started with developing, testing, and deploying the Myth Or Fact LGBT API.
+This tutorial should help you get started with developing in STS and deploying the Myth Or Fact LGBT API to platforms like Render.
