@@ -10,10 +10,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation; // Added
+import io.swagger.v3.oas.annotations.media.ArraySchema; // Added
+import io.swagger.v3.oas.annotations.media.Content; // Added
+import io.swagger.v3.oas.annotations.media.Schema; // Added
+import io.swagger.v3.oas.annotations.responses.ApiResponse; // Added
+import io.swagger.v3.oas.annotations.tags.Tag; // Added
+import java.util.List; // Added
 
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api") // Common prefix, or specific like /api/users if preferred for leaderboard
+@Tag(name = "Users & Leaderboard", description = "User specific operations and global leaderboard") // Updated Tag or new one
 public class UserController {
 
     private final UserService userService;
@@ -45,5 +53,15 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(UserResponse.fromUser(user));
+    }
+
+    @GetMapping("/leaderboard")
+    @Operation(summary = "Get global leaderboard", description = "Retrieves the top 10 users by highest score.")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved leaderboard",
+                 content = @Content(mediaType = "application/json",
+                                   array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
+    public ResponseEntity<List<UserResponse>> getGlobalLeaderboard() {
+        List<UserResponse> leaderboard = userService.getGlobalLeaderboard();
+        return ResponseEntity.ok(leaderboard);
     }
 }

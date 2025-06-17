@@ -8,5 +8,6 @@ public interface UserService {
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
     Optional<User> findById(Long id);
+    List<UserResponse> getGlobalLeaderboard();
     // Add other user-related service methods if needed
 }

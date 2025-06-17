@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder; // Will be added later
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.veras.mythOrFactLGBT.dto.UserResponse; // Added
+import java.util.List; // Added
+import java.util.stream.Collectors; // Added
 
 
 import java.util.Optional;
@@ -48,5 +51,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true) // Good practice for read-only operations
+    public List<UserResponse> getGlobalLeaderboard() {
+        List<User> topUsers = userRepository.findTop10ByOrderByHighestScoreDesc();
+        return topUsers.stream()
+                       .map(UserResponse::fromUser) // Assuming UserResponse has a static factory method or constructor
+                       .collect(Collectors.toList());
     }
 }

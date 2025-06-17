@@ -4,9 +4,11 @@ import com.veras.mythOrFactLGBT.model.GameHistory;
 import com.veras.mythOrFactLGBT.model.User;
 import com.veras.mythOrFactLGBT.repository.GameHistoryRepository;
 import com.veras.mythOrFactLGBT.repository.UserRepository;
+import com.veras.mythOrFactLGBT.dto.GameHistoryResponseDto; // New import
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.stream.Collectors; // New import
 
 
 import java.util.List;
@@ -40,14 +42,25 @@ public class GameHistoryServiceImpl implements GameHistoryService {
     }
 
     @Override
-    public List<GameHistory> getGameHistoryForUser(User user) {
-        return gameHistoryRepository.findByUserOrderByPlayedAtDesc(user);
+    @Transactional(readOnly = true)
+    public List<GameHistoryResponseDto> getGameHistoryForUser(User user) {
+        List<GameHistory> histories = gameHistoryRepository.findByUserOrderByPlayedAtDesc(user);
+        return histories.stream()
+                        .map(GameHistoryResponseDto::fromGameHistory)
+                        .collect(Collectors.toList());
     }
 
     @Override
-    public List<GameHistory> getLeaderboardByScoreForUser(Long userId) {
-        // This method name in repository might be better as findTopNByUserIdOrderByScoreDesc if we want a leaderboard
-        // For now, it fetches all and could be limited/paginated in the future
-        return gameHistoryRepository.findByUserIdOrderByScoreDesc(userId);
+    @Transactional(readOnly = true)
+    public List<GameHistoryResponseDto> getLeaderboardByScoreForUser(Long userId) {
+        // Ensure user exists, or handle appropriately (e.g., throw exception or return empty list)
+        // userService.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        // This check is good, but often done in controller or if service is public facing.
+        // For this method, if user doesn't exist, findByUserIdOrderByScoreDesc will return empty list, which is acceptable.
+
+        List<GameHistory> histories = gameHistoryRepository.findByUserIdOrderByScoreDesc(userId);
+        return histories.stream()
+                        .map(GameHistoryResponseDto::fromGameHistory)
+                        .collect(Collectors.toList());
     }
 }

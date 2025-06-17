@@ -77,6 +77,15 @@ This tutorial provides detailed instructions for setting up the local developmen
    4. Or, go to the "Spring Boot" tab and under "Profile", type `dev`.
    5. Click Apply, then Run.
 
+   **Enhanced Development Experience with `spring-boot-devtools`**
+
+   This project includes `spring-boot-devtools`, which enhances the local development experience by providing:
+   -   **Automatic Restart:** When files on the classpath change (e.g., you save a `.java` file), Spring Boot will automatically restart the application, so you don't have to do it manually.
+   -   **LiveReload:** `spring-boot-devtools` embeds a LiveReload server that can trigger a browser refresh when resources change. This is particularly useful for front-end development but can also be helpful for API testing if your client tools support it.
+   -   **Sensible Defaults:** It also configures some development-time sensible defaults (e.g., for caching with template engines, though not directly used in this REST API).
+
+   These features are active when running from your IDE (like STS) or using `mvn spring-boot:run`. They are automatically excluded from production builds.
+
 ---
 
 ## 2. Understanding the Project Structure
